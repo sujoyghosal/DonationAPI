@@ -1,5 +1,6 @@
 var express = require("express");
 var usergrid = require("usergrid");
+
 //var config = require('./config');
 // Set up Express environment and enable it to read and write JavaScript
 var allowCrossDomain = function(req, res, next) {
@@ -17,6 +18,7 @@ var allowCrossDomain = function(req, res, next) {
     }
 };
 var app = express();
+var allentities = [];
 app.use(allowCrossDomain);
 //app.use(express.bodyParser());
 app.use(express.urlencoded());
@@ -118,9 +120,10 @@ var needs_query = "";
 app.get("/getneeds", function(req, res) {
     var paramname = req.param("paramname");
     var paramvalue = req.param("paramvalue");
+    var emergency = req.param('emergency');
     needs_query = {
         type: "needs?limit=500", //Required - the type of collection to be retrieved
-        qs: { ql: paramname + "='" + paramvalue + "'" }
+        qs: { ql: paramname + "='" + paramvalue + "'" + " and emergency='" + emergency + "'" }
     };
     if (paramname === "uuid") {
         donations_query = {
@@ -213,6 +216,17 @@ function getgroupsforuser(req, res) {
             res.send("ERROR - " + JSON.stringify(err));
         } else {
             res.send(groups.entities);
+        }
+    });
+}
+
+function getgroupsforuser2(req, res) {
+    loggedIn.request(group_query, function(err, groups) {
+        if (err) {
+            console.log("ERROR - " + JSON.stringify(err));
+        } else {
+            console.log(groups.entities);
+            allgroups = groups;
         }
     });
 }
@@ -326,13 +340,13 @@ function updateuser(req, res) {
         uuid: req.param("uuid")
     };
     loggedIn.getEntity(option, function(err, entity) {
-        encryptedPw = encryptPassword(req.param('password'));
+        // encryptedPw = encryptPassword(req.param('password'));
         if (err) {
             res.send("ERROR");
         } else {
             entity.set("phone", req.param("phone"));
             entity.set("address", req.param("address"));
-            entity.set("pw", encryptedPw);
+            entity.set("pw", req.param('password'));
             entity.save(function(err) {
                 if (err) {
                     res.jsonp(500, "ERROR");
@@ -648,6 +662,8 @@ app.get("/createdonations", function(req, res) {
         phone_number: req.param("phone_number"),
         email: req.param("email"),
         currentcount: "0",
+        itemtype: req.param("itemtype"),
+        fa_icon: req.param('fa_icon'),
         items: req.param("items"),
         status: "OFFERED",
         time: req.param("time"),
@@ -693,6 +709,8 @@ app.get("/createneed", function(req, res) {
         phone_number: req.param("phone_number"),
         email: req.param("email"),
         currentcount: "0",
+        itemtype: req.param("itemtype"),
+        fa_icon: req.param("fa_icon"),
         items: req.param("items"),
         status: "REQUIRED",
         time: req.param("time"),
@@ -742,7 +760,9 @@ app.get("/createevent", function(req, res) {
         items: req.param("items"),
         status: req.param('status'),
         timestamp: req.param("time"),
-        eventtype: req.param('type'),
+        eventtype: req.param('itemtype'),
+        fa_icon: req.param('fa_icon'),
+        group_uuid: req.param('group'),
         location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
     };
     console.log("Create Event Body=" + JSON.stringify(e));
@@ -816,17 +836,17 @@ function connectentities(req, res) {
         }
     });
 }
-app.get("/getconnections", function(req, res) {
+app.get("/getconnectionsforgroup", function(req, res) {
     if (loggedIn === null) {
         logIn(req, res, function() {
-            getconnections(req, res);
+            getconnectionsforgroup(req, res);
         });
     } else {
-        getconnections(req, res);
+        getconnectionsforgroup(req, res);
     }
 });
 
-function getconnections(req, res) {
+function getconnectionsforgroup(req, res) {
 
     // create an Usergrid.Entity object that models the entity to retrieve connections for
     var options = {
@@ -836,7 +856,12 @@ function getconnections(req, res) {
             uuid: req.param('uuid')
         }
     };
-    var entity = new usergrid.entity(options);
+    try {
+        var entity = new usergrid.entity(options);
+    } catch (error) {
+        console.log("Error fetching connections - " + JSON.stringify(error));
+        return;
+    }
     // the connection type you want to retrieve
     var relationship = 'matches';
     // initiate the GET request
@@ -848,6 +873,118 @@ function getconnections(req, res) {
             // Success
             console.log("Success getting connected entities : " + JSON.stringify(result));
             res.jsonp(result);
+        }
+    });
+}
+var allconnections = [];
+var index = 0;
+var entity = {};
+
+function getconnectionsforgroup2(req, res, uuid, last) {
+
+    if (!uuid) {
+        console.log("getconnectionsforgroup2: No group uuid received");
+        return;
+    }
+
+    var options = {
+        client: loggedIn,
+        data: {
+            type: 'groups',
+            uuid: uuid
+        }
+    };
+    entity = new usergrid.entity(options);
+
+    // the connection type you want to retrieve
+    var relationship = 'matches';
+    // initiate the GET request
+    entity.getConnections(relationship, function(error, result) {
+        if (error) {
+            // Error
+            console.log("Error fetching connections - " + JSON.stringify(error));
+        } else {
+            // Success
+            console.log("Success getting connected entity for group id " + uuid);
+
+            //console.log(JSON.stringify(result));
+            if (result.entities && result.entities.length > 0)
+                allconnections = allconnections.concat(result.entities);
+        }
+    });
+    if (last) {
+        setTimeout(function() {
+            console.log("All Events: " + JSON.stringify(allconnections));
+            res.jsonp(allconnections);
+        }, 5000)
+    }
+}
+
+app.get("/geteventsforuser", function(req, res) {
+    if (loggedIn === null) {
+        logIn(req, res, function() {
+            geteventsforuser(req, res);
+        });
+    } else {
+        geteventsforuser(req, res);
+    }
+});
+
+function geteventsforuser(req, res) {
+
+    // create an Usergrid.Entity object that models the entity to retrieve connections for
+    var uuid = req.param("uuid");
+    allconnections = [];
+    allgroups = [];
+    index = 0;
+    group_query = {
+        method: "GET",
+        endpoint: "users/" + uuid + "/groups"
+    };
+    loggedIn.request(group_query, function(err, groups) {
+
+        if (err) {
+            console.log("ERROR - " + JSON.stringify(err));
+        } else {
+            var uuids = [];
+            if (!groups || !groups.entities || groups.entities.length == 0) {
+                console.log("No subscribed event groups found");
+                res.jsonp("No Groups Found");
+            }
+            console.log("Found " + groups.entities.length + " subscriptions.");
+            var query = '';
+            for (var i = 0; i < groups.entities.length; i++) {
+                uuids.push(groups.entities[i].uuid);
+                query += "group_uuid = '" + groups.entities[i].uuid + "'";
+                if (i < (groups.entities.length - 1))
+                    query += " or ";
+            }
+            // geteventsforgroups(req, res, uuids);
+            console.log("geteventsforuser query = " + query);
+            var options2 = {
+                type: "donationevents",
+                qs: {
+                    ql: query
+                }
+            };
+            if (loggedIn === null) {
+                logIn(req, res, function() {
+                    geteventsforuser(req, res);
+                });
+            } else {
+                loggedIn.createCollection(options2, function(err, events) {
+                    if (err) {
+                        res.jsonp(e);
+                        return;
+                    }
+                    var allevents = [];
+                    while (events.hasNextEntity()) {
+                        var aevent = events.getNextEntity().get();
+                        allevents.push(aevent);
+                    }
+                    res.jsonp(allevents);
+                });
+            }
         }
     });
 }
@@ -879,7 +1016,14 @@ app.get("/vicinityquery", function(req, res) {
             type: "needs?limit=" + count, //Required - the type of collection to be retrieved
             //		qs:criteria
             //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
-            qs: { ql: criteria }
+            qs: { ql: criteria + " and not emergency = 'YES'" }
+        };
+    } else if (type && type === 'emergency') {
+        geo_query = {
+            type: "needs?limit=" + count, //Required - the type of collection to be retrieved
+            //		qs:criteria
+            //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
+            qs: { ql: criteria + " and emergency = 'YES'" }
         };
     } else {
         res.jsonp("Invalid Type - must be offers or needs");
@@ -987,7 +1131,7 @@ app.get("/createuser", function(req, res) {
     var email = req.param("email");
     var phone = req.param("phone");
     var address = req.param("address");
-    encryptedPw = encryptPassword(password);
+    //encryptedPw = encryptPassword(password);
     var options = {
         method: "POST",
         endpoint: "users",
@@ -997,7 +1141,7 @@ app.get("/createuser", function(req, res) {
             email: email,
             address: address,
             fullname: fullname,
-            pw: encryptedPw,
+            pw: password,
             phone: phone
         }
     };
@@ -1032,6 +1176,7 @@ function encryptPassword(password) {
 
 function checkPassword(password, hash) {
     return bcrypt.compareSync(password, hash);
+    //return true;
 };
 app.get("/getuser", function(req, res) {
     var email = req.param("email");
@@ -1063,6 +1208,40 @@ function getuserbyemail(e, req, res) {
         }
         if (allusers.length > 0) res.jsonp(allusers);
         else res.send("User Not Found");
+    });
+}
+
+//Call request to initiate the API call
+function geteventsforgroups(req, res, groups) {
+    if (!groups || groups.length == 0) {
+        console.log('Invalid Groups uuids');
+        return;
+    }
+    var query = '';
+    for (var i = 0; i < groups.length; i++) {
+        query += "group_uuid = '" + groups[i] + "'";
+        if (i < (groups.length - 1))
+            query += " or ";
+    }
+    console.log("geteventsforgroups query = " + query)
+    var options2 = {
+        type: "donationevents",
+        qs: {
+            ql: query
+        }
+    };
+    loggedIn.createCollection(options2, function(err, events) {
+        if (err) {
+            res.jsonp(e);
+            return;
+        }
+        var allevents = [];
+        while (events.hasNextEntity()) {
+            var aevent = events.getNextEntity().get();
+            allevents.push(aevent);
+        }
+        if (allevents.length > 0) res.jsonp(allevents);
+        else res.send("Events Not Found");
     });
 }
 app.get("/loginuser", function(req, res) {
@@ -1135,5 +1314,8 @@ function expireToken() {
     }
 }
 // Listen for requests until the server is stopped
-app.listen(9000);
-console.log("Listening on port 9000");
+
+var port = process.env.PORT || 9000;
+app.listen(port, function() {
+    console.log("To view your app, open this link in your browser: http://localhost:" + port);
+});
