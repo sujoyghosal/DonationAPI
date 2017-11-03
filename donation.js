@@ -1016,15 +1016,16 @@ app.get("/vicinityquery", function(req, res) {
             type: "needs?limit=" + count, //Required - the type of collection to be retrieved
             //		qs:criteria
             //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
-            qs: { ql: criteria + " and not emergency = 'YES'" }
+            qs: { ql: criteria + " and not (emergency = 'YES' or emergency = 'true')" }
         };
     } else if (type && type === 'emergency') {
         geo_query = {
             type: "needs?limit=" + count, //Required - the type of collection to be retrieved
             //		qs:criteria
             //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
-            qs: { ql: criteria + " and emergency = 'YES'" }
+            qs: { ql: criteria + " and (emergency = 'true' or emergency = 'YES')" }
         };
+        console.log("Emergency Query = " + geo_query);
     } else {
         res.jsonp("Invalid Type - must be offers or needs");
         return;
