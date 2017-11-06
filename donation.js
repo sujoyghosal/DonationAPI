@@ -945,11 +945,13 @@ function geteventsforuser(req, res) {
 
         if (err) {
             console.log("ERROR - " + JSON.stringify(err));
+            return;
         } else {
             var uuids = [];
             if (!groups || !groups.entities || groups.entities.length == 0) {
                 console.log("No subscribed event groups found");
                 res.jsonp("No Groups Found");
+                return;
             }
             console.log("Found " + groups.entities.length + " subscriptions.");
             var query = '';
@@ -1132,7 +1134,7 @@ app.get("/createuser", function(req, res) {
     var email = req.param("email");
     var phone = req.param("phone");
     var address = req.param("address");
-    //encryptedPw = encryptPassword(password);
+    encryptedPw = encryptPassword(password);
     var options = {
         method: "POST",
         endpoint: "users",
@@ -1142,7 +1144,7 @@ app.get("/createuser", function(req, res) {
             email: email,
             address: address,
             fullname: fullname,
-            pw: password,
+            pw: encryptedPw,
             phone: phone
         }
     };
