@@ -1,6 +1,22 @@
 var express = require("express");
 var usergrid = require("usergrid");
-
+var nodemailer = require('nodemailer');
+var randtoken = require('rand-token');
+var async = require('async');
+//var BASEURL = "http://localhost:9000";
+//var BASEGUIURL = "http://localhost:3000";
+var BASEURL = "https://freecycleapissujoy.mybluemix.net";
+var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
+var transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        type: 'OAuth2',
+        clientId: "991979531146-rdoiba5l9mctvl73eue2037eon731kei.apps.googleusercontent.com",
+        clientSecret: "jTpcWci-Uh1ZtsXWzcAAGsKu"
+    }
+});
 //var config = require('./config');
 // Set up Express environment and enable it to read and write JavaScript
 var allowCrossDomain = function(req, res, next) {
@@ -337,22 +353,23 @@ app.get("/updateuser", function(req, res) {
 function updateuser(req, res) {
     var option = {
         type: "users",
-        uuid: req.param("uuid")
+        name: req.param("name")
     };
     loggedIn.getEntity(option, function(err, entity) {
-        // encryptedPw = encryptPassword(req.param('password'));
+
         if (err) {
             res.send("ERROR");
         } else {
+            encryptedPw = encryptPassword(req.param('password'));
             entity.set("phone", req.param("phone"));
             entity.set("address", req.param("address"));
-            entity.set("pw", req.param('password'));
+            entity.set("pw", encryptedPw);
             entity.save(function(err) {
                 if (err) {
                     res.jsonp(500, "ERROR");
                     return;
                 }
-                res.send(entity);
+                res.jsonp(entity);
             });
         }
     });
@@ -1284,6 +1301,101 @@ function getuserafterauth(e, req, res) {
             res.send("Authentication Error");
     });
 }
+
+app.get("/verifyresettoken", function(req, res) {
+    if (loggedIn === null) {
+        logIn(req, res, verifyresettoken);
+    } else {
+        verifyresettoken(req, res);
+    }
+});
+
+function verifyresettoken(req, res) {
+    var option = {
+        type: "users",
+        name: req.param("email")
+    };
+    loggedIn.getEntity(option, function(err, entity) {
+        // encryptedPw = encryptPassword(req.param('password'));
+        if (err) {
+            res.send("ERROR");
+        } else {
+            console.log("verifyresettoken: entity = " + JSON.stringify(entity));
+            var resettoken = entity.get("resettoken");
+
+            console.log("ResetToken = " + resettoken);
+            if (resettoken === req.param('token')) {
+                console.log("Password reset token matched successfully");
+                res.send("Please follow the following link to set a new password: " + BASEGUIURL + "#updatepassword");
+                return;
+            } else {
+                console.log("Password reset token NOT matched");
+                res.send("FAIL");
+                return;
+            }
+        }
+    });
+
+}; //qs:{ql:"name='bread' or uuid=b3aad0a4-f322-11e2-a9c1-999e12039f87"}
+
+app.get("/sendresetpwmail", function(req, res) {
+
+    if (loggedIn === null) {
+        logIn(req, res, saveresettokenandsendmail);
+    } else {
+        saveresettokenandsendmail(req, res);
+    } //qs:{ql:"name='bread' or uuid=b3aad0a4-f322-11e2-a9c1-999e12039f87"}
+});
+
+var emailtext = "";
+var saveresettokenandsendmail = function(req, res) {
+    var option = {
+        type: "users",
+        name: req.param("email")
+    };
+    loggedIn.getEntity(option, function(err, entity) {
+        // encryptedPw = encryptPassword(req.param('password'));
+        if (err) {
+            console.log("ERROR: " + JSON.stringify(err));
+        } else {
+            console.log("saveresttoken: Found user SUCCESS for email=" + req.param('email'));
+            var token = randtoken.generate(16);
+            entity.set("resettoken", token);
+            entity.save(function(err, data) {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                } else {
+                    var to = req.param('to');
+                    var subject = 'Reset Pasword';
+                    emailtext = "Please use the following link to reset your password\n";
+                    emailtext += BASEURL + "/verifyresettoken?token=" + token + "&email=" + req.param('email');
+                    console.log("######saveresttoken updated user entity SUCCESS.");
+                    sendmail(req, res, emailtext);
+                }
+            });
+        }
+    });
+};
+
+//Call request to initiate the API call
+function sendmail(req, res, text) {
+
+    transporter.sendMail({
+        from: "sujoy.ghosal@gmail.com",
+        to: req.param('email'),
+        subject: 'Password Reset',
+        text: text,
+        auth: {
+            user: 'sujoy.ghosal@gmail.com',
+            refreshToken: '1/cmlvnBPn8-FCiim25R0J9c68zO1FTeaiYIzUGr_5ldw',
+            accessToken: 'ya29.Glv-BAff-7QHfbnhJ5LvhexaatvSAWsi_pq13DvwoXXunD_EKB59VB86bVvFH38gAAw7UR5CLZxX0jmMLyF_laCvEwqv_nSyZbluWiVCD6V_v_0ko5nNW50hQjeo',
+            expires: 3600
+        }
+    });
+    console.log("Sent mail");
+    res.send("Sent Mail");
+}
+
 var login_query = "";
 // We need this for UserGrid authentication
 function logIn(req, res, next) {
