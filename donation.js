@@ -760,7 +760,7 @@ function createneed(e, req, res) {
                 res.send(err);
                 return;
             }
-            res.jsonp(o);
+            res.send("NEED CREATED");
         });
     });
 }
@@ -808,10 +808,6 @@ function createevent(e, req, res) {
                 res.send(err);
                 return;
             }
-
-            //alert("#####Client Socket Connected");
-            //socket.emit('emergency', "Please Broadcast");
-
             res.jsonp(o);
         });
     });
@@ -985,7 +981,7 @@ function geteventsforuser(req, res) {
             // geteventsforgroups(req, res, uuids);
             console.log("geteventsforuser query = " + query);
             var options2 = {
-                type: "donationevents?limit=100",
+                type: "donationevents",
                 qs: {
                     ql: query
                 }
@@ -1006,7 +1002,6 @@ function geteventsforuser(req, res) {
                         allevents.push(aevent);
                     }
                     res.jsonp(allevents);
-                    return allevents.length;
                 });
             }
         }
@@ -1436,13 +1431,6 @@ function expireToken() {
 // Listen for requests until the server is stopped
 
 var port = process.env.PORT || 9000;
-var server = app.listen(port, function() {
+app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
-});
-var io = require('socket.io').listen(server);
-io.on('connect', function(socket) {
-    socket.on('emergency', function(data) {
-        console.log("#####Broadcasting emergency: " + JSON.stringify(data));
-        socket.broadcast.emit('emergencydata', data);
-    });
 });
