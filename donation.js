@@ -1435,7 +1435,7 @@ function expireToken() {
 }
 // Listen for requests until the server is stopped
 
-var port = process.env.MYPORT || 9000;
+var port = process.env.PORT || 9000;
 var mysocket = null;
 var server = app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
