@@ -981,7 +981,7 @@ function geteventsforuser(req, res) {
             // geteventsforgroups(req, res, uuids);
             console.log("geteventsforuser query = " + query);
             var options2 = {
-                type: "donationevents",
+                type: "donationevents?limit=100",
                 qs: {
                     ql: query
                 }
