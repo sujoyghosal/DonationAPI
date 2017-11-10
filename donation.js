@@ -5,7 +5,7 @@ var randtoken = require('rand-token');
 var async = require('async');
 //var BASEURL = "http://localhost:9000";
 //var BASEGUIURL = "http://localhost:3000";
-var BASEURL = "https://freecycleapissujoy.mybluemix.net:9000";
+var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
