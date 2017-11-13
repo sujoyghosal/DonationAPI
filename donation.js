@@ -3,10 +3,15 @@ var usergrid = require("usergrid");
 var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 var async = require('async');
-//var BASEURL = "http://localhost:9000";
+//var PORT = process.env.VCAP_APP_PORT || 9000;
+//var BASEURL = "http://localhost:" + PORT;
 //var BASEGUIURL = "http://localhost:3000";
+
+//CloudFoundry Configs
 var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
+var PORT = process.env.VCAP_APP_PORT || 80;
+
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -786,9 +791,11 @@ app.get("/createevent", function(req, res) {
         items: req.param("items"),
         status: req.param('status'),
         timestamp: req.param("time"),
-        eventtype: req.param('itemtype'),
+        itemtype: req.param('itemtype'),
+        eventtype: req.param('group_name'),
         fa_icon: req.param('fa_icon'),
-        group_uuid: req.param('group'),
+        group_uuid: req.param('group_uuid'),
+        group_name: req.param('group_name'),
         location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
     };
     console.log("Create Event Body=" + JSON.stringify(e));
@@ -816,6 +823,13 @@ function createevent(e, req, res) {
             if (err) {
                 res.send(err);
                 return;
+            }
+            if (mysocket) {
+                console.log("##### Sending subscribed event object");
+                mysocket.broadcast.emit('matchingevent', o);
+                console.log("#### Sent event emergencydata");
+            } else {
+                console.log("#### mysocket is null");
             }
             res.jsonp(o);
         });
@@ -1440,7 +1454,7 @@ function expireToken() {
 // Listen for requests until the server is stopped
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var PORT = process.env.VCAP_APP_PORT || 80;
+
 var mysocket = null;
 http.listen(PORT, function() {
     console.log('listening on *:' + PORT);
