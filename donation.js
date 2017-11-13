@@ -764,7 +764,7 @@ function createneed(e, req, res) {
             }
             if (mysocket) {
                 console.log("##### Sending emergency event object");
-                mysocket.emit('emergencydata', o);
+                mysocket.broadcast.emit('emergencydata', o);
                 console.log("#### Sent event emergencydata");
             } else {
                 console.log("#### mysocket is null");
