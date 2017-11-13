@@ -5,7 +5,7 @@ var randtoken = require('rand-token');
 var async = require('async');
 //var BASEURL = "http://localhost:9000";
 //var BASEGUIURL = "http://localhost:3000";
-var BASEURL = "https://freecycleapissujoy.mybluemix.net:8443";
+var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -1440,7 +1440,7 @@ function expireToken() {
 // Listen for requests until the server is stopped
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var PORT = process.env.VCAP_APP_PORT || 8443;
+var PORT = process.env.VCAP_APP_PORT || 80;
 var mysocket = null;
 http.listen(PORT, function() {
     console.log('listening on *:' + PORT);

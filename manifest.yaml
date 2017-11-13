@@ -2,6 +2,3 @@ applications:
 - name: SujoyFreeCycleAPI
   random-route: true
   memory: 128M
-  properties:
-  logger_endpoint:
-    port: 8443
