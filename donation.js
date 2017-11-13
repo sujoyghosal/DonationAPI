@@ -5,7 +5,7 @@ var randtoken = require('rand-token');
 var async = require('async');
 //var BASEURL = "http://localhost:9000";
 //var BASEGUIURL = "http://localhost:3000";
-var BASEURL = "https://freecycleapissujoy.mybluemix.net";
+var BASEURL = "https://freecycleapissujoy.mybluemix.net:8443";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -760,6 +760,13 @@ function createneed(e, req, res) {
                 res.send(err);
                 return;
             }
+            if (mysocket) {
+                console.log("##### Sending emergency event object");
+                mysocket.emit('emergencydata', o);
+                console.log("#### Sent event emergencydata");
+            } else {
+                console.log("#### mysocket is null");
+            }
             res.send("NEED CREATED");
         });
     });
@@ -1429,8 +1436,14 @@ function expireToken() {
     }
 }
 // Listen for requests until the server is stopped
-
-var port = process.env.PORT || 9000;
-app.listen(port, function() {
-    console.log("To view your app, open this link in your browser: http://localhost:" + port);
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var PORT = process.env.VCAP_APP_PORT || 8443;
+var mysocket = null;
+http.listen(PORT, function() {
+    console.log('listening on *:' + PORT);
+});
+io.on('connection', function(socket) {
+    mysocket = socket;
+    console.log('a user connected');
 });
