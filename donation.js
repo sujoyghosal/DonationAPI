@@ -6,7 +6,6 @@ var async = require('async');
 //var PORT = process.env.VCAP_APP_PORT || 9000;
 //var BASEURL = "http://localhost:" + PORT;
 //var BASEGUIURL = "http://localhost:3000";
-
 //CloudFoundry Configs
 var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
