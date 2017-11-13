@@ -1,4 +1,4 @@
 applications:
-- name: SujoyFreeCycleAPI
+- name: FreeCycleAPIsSujoy
   random-route: true
   memory: 128M
