@@ -3,9 +3,11 @@ var usergrid = require("usergrid");
 var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 var async = require('async');
-//var PORT = process.env.VCAP_APP_PORT || 9000;
-//var BASEURL = "http://localhost:" + PORT;
-//var BASEGUIURL = "http://localhost:3000";
+
+/*var PORT = process.env.VCAP_APP_PORT || 9000;
+var BASEURL = "http://localhost:" + PORT;
+var BASEGUIURL = "http://localhost:3000";*/
+
 //CloudFoundry Configs
 var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
@@ -766,13 +768,13 @@ function createneed(e, req, res) {
                 res.send(err);
                 return;
             }
-            if (mysocket) {
+            /*if (mysocket) {
                 console.log("##### Sending emergency event object");
                 mysocket.broadcast.emit('emergencydata', o);
                 console.log("#### Sent event emergencydata");
             } else {
                 console.log("#### mysocket is null");
-            }
+            }*/
             res.send("NEED CREATED");
         });
     });
@@ -826,7 +828,7 @@ function createevent(e, req, res) {
             if (mysocket) {
                 console.log("##### Sending subscribed event object");
                 mysocket.broadcast.emit('matchingevent', o);
-                console.log("#### Sent event emergencydata");
+                console.log("#### Sent event matchingevent");
             } else {
                 console.log("#### mysocket is null");
             }
