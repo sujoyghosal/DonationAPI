@@ -773,7 +773,8 @@ function createneed(e, req, res) {
             }
             /*if (mysocket) {
                 console.log("##### Sending emergency event object");
-                mysocket.broadcast.emit('emergencydata', o);
+                //mysocket.broadcast.emit('emergencydata', o);
+                io.sockets.emit('emergencydata', o);
                 console.log("#### Sent event emergencydata");
             } else {
                 console.log("#### mysocket is null");
@@ -830,7 +831,8 @@ function createevent(e, req, res) {
             }
             if (mysocket) {
                 console.log("##### Sending subscribed event object");
-                mysocket.broadcast.emit('matchingevent', o);
+                //mysocket.broadcast.emit('matchingevent', o);
+                io.sockets.emit('matchingevent', o);
                 console.log("#### Sent event matchingevent");
             } else {
                 console.log("#### mysocket is null");
