@@ -4,15 +4,16 @@ var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 var async = require('async');
 
-/*var PORT = process.env.VCAP_APP_PORT || 9000;
+var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
-var BASEGUIURL = "http://localhost:3000";*/
+var BASEGUIURL = "http://localhost:3000";
 
 //CloudFoundry Configs
+/*
 var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 var PORT = process.env.VCAP_APP_PORT || 80;
-
+*/
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -368,10 +369,12 @@ function updateuser(req, res) {
         if (err) {
             res.send("ERROR");
         } else {
-            encryptedPw = encryptPassword(req.param('password'));
+            if (req.param('password')) {
+                encryptedPw = encryptPassword(req.param('password'));
+                entity.set("pw", encryptedPw);
+            }
             entity.set("phone", req.param("phone"));
             entity.set("address", req.param("address"));
-            entity.set("pw", encryptedPw);
             entity.save(function(err) {
                 if (err) {
                     res.jsonp(500, "ERROR");
