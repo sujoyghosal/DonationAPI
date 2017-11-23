@@ -55,8 +55,8 @@ var ug = new usergrid.client({
     orgName: "sujoyghosal",
     appName: "FREECYCLE",
     URI: "https://apibaas-trial.apigee.net",
-    clientId: "YXA6G1hmX-hzEea1pBIuBzeXfQ",
-    clientSecret: "YXA6c7dP5Vh70lI3N1VHoQfP1lvlstQ",
+    clientId: "b3U6qZdN9MaZEeanNBIuBzeXfQ",
+    clientSecret: "b3U6-cw_nkkX9VRDgrvKwi0ofs2Sr4E",
     logging: true
 });
 var loggedIn = null;
@@ -785,7 +785,8 @@ function createneed(e, req, res) {
 }
 app.get("/createevent", function(req, res) {
     var b = req.body;
-    var name = req.param("email") + "-" + req.param("time");
+    var t = new Date();
+    var name = req.param("email") + "-" + t;
     var e = {
         name: name,
         postedby: req.param("postedby"),
@@ -816,17 +817,29 @@ app.get("/createevent", function(req, res) {
 function createevent(e, req, res) {
     var opts = {
         type: "donationevents"
-            // name: 'Dominos'
     };
     loggedIn.createEntity(opts, function(err, o) {
         if (err) {
+            console.log("####loggedIn.createEntity error");
             res.send(err);
             return;
+        }
+        if (!o) {
+            console.log("####Null object o returned");
         }
         o.set(e);
         o.save(function(err) {
             if (err) {
-                res.send(err);
+                console.log("####o.save error");
+                //res.send(err);
+                //return;
+                if (loggedIn === null) {
+                    logIn(req, res, function() {
+                        createevent(e, req, res);
+                    });
+                } else {
+                    createevent(e, req, res);
+                }
                 return;
             }
             if (mysocket) {
@@ -1428,8 +1441,8 @@ function sendmail(req, res, text) {
 var login_query = "";
 // We need this for UserGrid authentication
 function logIn(req, res, next) {
-    console.log("Logging in as %s", "sujoyghosal");
-    ug.login("sujoyghosal", "Kolkata1", function(err) {
+    console.log("Logging in as %s", "freecycleadmin");
+    ug.login("freecycleadmin", "abc123", function(err) {
         if (err) {
             console.log("Login failed: %s", JSON.stringify(err));
             res.jsonp(500, { error: err });
