@@ -828,9 +828,10 @@ function createevent(e, req, res) {
             console.log("####Null object o returned");
         }
         o.set(e);
+        console.log("####Attempting to save entity, will re-login on failure.")
         o.save(function(err) {
             if (err) {
-                console.log("####o.save error");
+                console.log("####o.save error, re-login");
                 //res.send(err);
                 //return;
                 if (loggedIn === null) {
