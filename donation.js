@@ -846,7 +846,7 @@ function createevent(e, req, res) {
                 console.log("##### Sending subscribed event object");
                 //mysocket.broadcast.emit('matchingevent', o);
                 io.sockets.emit('matchingevent', o);
-                console.log("#### Sent event matchingevent");
+                console.log("####Sent matchingevent");
             } else {
                 console.log("#### mysocket is null");
             }
