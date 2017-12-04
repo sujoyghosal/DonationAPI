@@ -16,7 +16,7 @@ var BASEURL_DEV = "https://freecycleapissujoy.mybluemix.net";
 var BASEURL_PROD = "https://sujoyfreecycleeventsapi.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 
-var BASEURL = BASEURL_PROD;
+var BASEURL = BASEURL_DEV;
 var PORT = process.env.VCAP_APP_PORT || 80;
 
 // Usergrid config - Common for all platforms
