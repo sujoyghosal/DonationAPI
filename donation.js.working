@@ -1,36 +1,18 @@
 var express = require("express");
 var usergrid = require("usergrid");
-var randtoken = require("rand-token");
 var nodemailer = require('nodemailer');
+var randtoken = require('rand-token');
+var async = require('async');
 /*
-// Run Locally
 var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
 var BASEGUIURL = "http://localhost:3000";
 */
+//CloudFoundry Configs
 
-//Run on Cloud
-var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
-var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
-var BASEURL_DEV = "https://freecycleapissujoy.mybluemix.net";
-var BASEURL_PROD = "https://sujoyfreecycleeventsapi.mybluemix.net";
+var BASEURL = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
-
-var BASEURL = BASEURL_PROD;
 var PORT = process.env.VCAP_APP_PORT || 80;
-
-// Usergrid config - Common for all platforms
-var APPNAME_DEV = 'FREECYCLE';
-var CLIENTID_DEV = 'YXA6G1hmX-hzEea1pBIuBzeXfQ';
-var CLIENTSECRET_DEV = 'YXA6c7dP5Vh70lI3N1VHoQfP1lvlstQ';
-
-var APPNAME_PROD = 'FREECYCLEPROD';
-var CLIENTID_PROD = 'YXA6cnbPTdTZEee6gArYgfQDvw';
-var CLIENTSECRET_PROD = 'YXA6hxDLbKkvxjASKEClHbWYCQYh-c8';
-
-var APPNAME = APPNAME_PROD;
-var CLIENTID = CLIENTID_PROD;
-var CLIENTSECRET = CLIENTSECRET_PROD;
 
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -71,10 +53,10 @@ var bcrypt = require('bcrypt');
 var encryptedPw = 'null';
 var ug = new usergrid.client({
     orgName: "sujoyghosal",
-    appName: APPNAME,
+    appName: "FREECYCLE",
     URI: "https://apibaas-trial.apigee.net",
-    clientId: CLIENTID,
-    clientSecret: CLIENTSECRET,
+    clientId: "b3U6qZdN9MaZEeanNBIuBzeXfQ",
+    clientSecret: "b3U6-cw_nkkX9VRDgrvKwi0ofs2Sr4E",
     logging: true
 });
 var loggedIn = null;
@@ -85,7 +67,7 @@ var rootTemplate = {
 };
 app.get("/", function(req, resp) {
     //    resp.jsonp(rootTemplate);
-    var out = "Hey, are you looking for something?";
+    out = "Hey, are you looking for something?";
     out +=
         "  Use /alldonations to get all donations or createdonations with name=value pairs to create a donations";
     resp.jsonp(out);
@@ -1469,7 +1451,7 @@ function logIn(req, res, next) {
         }
         loggedIn = new usergrid.client({
             orgName: "sujoyghosal",
-            appName: APPNAME,
+            appName: "FREECYCLE",
             URI: "https://apibaas-trial.apigee.net",
             authType: usergrid.AUTH_APP_USER,
             token: ug.token,
