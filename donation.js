@@ -2,13 +2,13 @@ var express = require("express");
 var usergrid = require("usergrid");
 var randtoken = require("rand-token");
 var nodemailer = require('nodemailer');
+var request = require("request");
 /*
 // Run Locally
 var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
 var BASEGUIURL = "http://localhost:3000";
 */
-
 //Run on Cloud
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
@@ -1456,7 +1456,38 @@ function sendmail(req, res, text) {
     console.log("Sent mail");
     res.send("Sent Mail");
 }
+app.get('/sendfcmpush', function(req, res) {
+    console.log("Sending FCM Push....");
+    var options = {
+        method: 'POST',
+        url: 'https://cordova-plugin-fcm.appspot.com/push/freesend',
+        headers: {
+            'cache-control': 'no-cache',
+            'access-control-allow-origin': '*',
+            'content-type': 'application/json'
+        },
+        body: {
+            recipient: 'all',
+            isTopic: 'true',
+            title: req.param('title'),
+            body: req.param('text'),
+            apiKey: 'AAAA5vaWa4o:APA91bGdenh15KUIJVAKISsHLNCgPLka_Npdal5v8YsZnK2lEps5E6Bc0ImAka8zytn1D5t_t0iZSlfqVNSJFTkXYPA3PIhG-3a7qtKDeHfMF3MQNctwW4Dnw2vObuqFeY7zMj62Qud9',
+            application: 'com.sujoy.freecycle',
+            customData: [{
+                param: 'a',
+                value: 'b'
+            }]
+        },
+        json: true
+    };
 
+    request(options, function(error, response, body) {
+        if (error) throw new Error(error);
+
+        console.log(body);
+        res.send("SUCCESS");
+    });
+});
 var login_query = "";
 // We need this for UserGrid authentication
 function logIn(req, res, next) {
