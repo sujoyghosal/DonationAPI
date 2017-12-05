@@ -14,7 +14,6 @@ var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
 var BASEURL_BLUEMIX = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
-
 var BASEURL = BASEURL_BLUEMIX;
 var PORT = process.env.VCAP_APP_PORT || 80;
 
@@ -801,75 +800,65 @@ function createneed(e, req, res) {
     });
 }
 app.get("/createevent", function(req, res) {
-    var b = req.body;
     var t = new Date();
     var name = req.param("email") + "-" + t;
-    var e = {
-        name: name,
-        postedby: req.param("postedby"),
-        city: req.param("city"),
-        address: req.param("address"),
-        phone_number: req.param("phone_number"),
-        email: req.param("email"),
-        items: req.param("items"),
-        status: req.param('status'),
-        timestamp: req.param("time"),
-        itemtype: req.param('itemtype'),
-        eventtype: req.param('group_name'),
-        fa_icon: req.param('fa_icon'),
-        group_uuid: req.param('group_uuid'),
-        group_name: req.param('group_name'),
-        location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
+    var options = {
+        method: "POST",
+        endpoint: "donationevents",
+        body: {
+            name: name,
+            postedby: req.param("postedby"),
+            city: req.param("city"),
+            address: req.param("address"),
+            phone_number: req.param("phone_number"),
+            email: req.param("email"),
+            items: req.param("items"),
+            status: req.param('status'),
+            timestamp: req.param("time"),
+            itemtype: req.param('itemtype'),
+            eventtype: req.param('group_name'),
+            fa_icon: req.param('fa_icon'),
+            group_uuid: req.param('group_uuid'),
+            group_name: req.param('group_name'),
+            location: {
+                latitude: req.param("latitude"),
+                longitude: req.param("longitude")
+            }
+        }
+
     };
-    console.log("Create Event Body=" + JSON.stringify(e));
     if (loggedIn === null) {
         logIn(req, res, function() {
-            createevent(e, req, res);
+            createevent(options, req, res);
         });
     } else {
-        createevent(e, req, res);
+        createevent(options, req, res);
     }
 });
 
 function createevent(e, req, res) {
-    var opts = {
-        type: "donationevents"
-    };
-    loggedIn.createEntity(opts, function(err, o) {
+    loggedIn.request(e, function(err, data) {
         if (err) {
-            console.log("####loggedIn.createEntity error");
-            res.send(err);
-            return;
-        }
-        if (!o) {
-            console.log("####Null object o returned");
-        }
-        o.set(e);
-        console.log("####Attempting to save entity, will re-login on failure.")
-        o.save(function(err) {
-            if (err) {
-                console.log("####o.save error, re-login");
-                //res.send(err);
-                //return;
-                if (loggedIn === null) {
-                    logIn(req, res, function() {
-                        createevent(e, req, res);
-                    });
-                } else {
-                    createevent(e, req, res);
-                }
-                return;
-            }
+            res.send("ERROR");
+        } else {
+            console.log("#######CreateEvents2 Success!!!!!");
             if (mysocket) {
                 console.log("##### Sending subscribed event object");
                 //mysocket.broadcast.emit('matchingevent', o);
-                io.sockets.emit('matchingevent', o);
+                io.sockets.emit('matchingevent', data);
                 console.log("####Sent matchingevent");
+                var msg = JSON.stringify(data.entities[0].items + "@: " +
+                    data.entities[0].address + ". Contact " + data.entities[0].postedby + ": " +
+                    data.entities[0].phone_number + " / " + data.entities[0].email);
+                sendFCMPush("FreeCycle Event", msg);
+                console.log("#####Event Object = " + JSON.stringify(data));
+                res.jsonp(data);
             } else {
                 console.log("#### mysocket is null");
+                res.send("EVENT CREATED BUT NOT BROADCAST DUE TO NULL SOCKET!");
             }
-            res.jsonp(o);
-        });
+
+        }
     });
 }
 app.get("/connectentities", function(req, res) {
@@ -1455,7 +1444,8 @@ function sendmail(req, res, text) {
     console.log("Sent mail");
     res.send("Sent Mail");
 }
-app.get('/sendfcmpush', function(req, res) {
+
+function sendFCMPush(title, text) {
     console.log("Sending FCM Push....");
     var options = {
         method: 'POST',
@@ -1468,8 +1458,8 @@ app.get('/sendfcmpush', function(req, res) {
         body: {
             recipient: 'all',
             isTopic: 'true',
-            title: req.param('title'),
-            body: req.param('text'),
+            title: title,
+            body: text,
             apiKey: 'AAAA5vaWa4o:APA91bGdenh15KUIJVAKISsHLNCgPLka_Npdal5v8YsZnK2lEps5E6Bc0ImAka8zytn1D5t_t0iZSlfqVNSJFTkXYPA3PIhG-3a7qtKDeHfMF3MQNctwW4Dnw2vObuqFeY7zMj62Qud9',
             application: 'com.sujoy.freecycle',
             customData: [{
@@ -1484,9 +1474,9 @@ app.get('/sendfcmpush', function(req, res) {
         if (error) throw new Error(error);
 
         console.log(body);
-        res.send("SUCCESS");
+        return ("SUCCESS");
     });
-});
+};
 var login_query = "";
 // We need this for UserGrid authentication
 function logIn(req, res, next) {
