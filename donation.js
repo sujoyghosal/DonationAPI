@@ -1455,7 +1455,7 @@ function sendFCMPush(title, text, topic) {
             'content-type': 'application/json'
         },
         body: {
-            recipient: topic,
+            recipient: 'all',
             isTopic: 'true',
             title: title,
             body: text,
