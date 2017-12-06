@@ -850,7 +850,7 @@ function createevent(e, req, res) {
                 var msg = JSON.stringify(data.entities[0].items + "@: " +
                     data.entities[0].address + ". Contact " + data.entities[0].postedby + ": " +
                     data.entities[0].phone_number + " / " + data.entities[0].email);
-                sendFCMPush("FreeCycle Event", msg);
+                sendFCMPush("FreeCycle Event", msg, data.entities[0].group_name.replace(/-/g, ' '));
                 console.log("#####Event Object = " + JSON.stringify(data));
                 res.jsonp(data);
             } else {
@@ -1426,7 +1426,6 @@ var saveresettokenandsendmail = function(req, res) {
     });
 };
 
-//Call request to initiate the API call
 function sendmail(req, res, text) {
 
     transporter.sendMail({
@@ -1445,7 +1444,7 @@ function sendmail(req, res, text) {
     res.send("Sent Mail");
 }
 
-function sendFCMPush(title, text) {
+function sendFCMPush(title, text, topic) {
     console.log("Sending FCM Push....");
     var options = {
         method: 'POST',
@@ -1456,7 +1455,7 @@ function sendFCMPush(title, text) {
             'content-type': 'application/json'
         },
         body: {
-            recipient: 'all',
+            recipient: topic,
             isTopic: 'true',
             title: title,
             body: text,
