@@ -850,7 +850,7 @@ function createevent(e, req, res) {
                 var msg = JSON.stringify(data.entities[0].items + "@: " +
                     data.entities[0].address + ". Contact " + data.entities[0].postedby + ": " +
                     data.entities[0].phone_number + " / " + data.entities[0].email);
-                sendFCMPush("FreeCycle Event", msg, data.entities[0].group_name.replace(/-/g, ' '));
+                sendFCMPush("FreeCycle Event", msg);
                 console.log("#####Event Object = " + JSON.stringify(data));
                 res.jsonp(data);
             } else {
@@ -1444,7 +1444,15 @@ function sendmail(req, res, text) {
     res.send("Sent Mail");
 }
 
-function sendFCMPush(title, text, topic) {
+app.get("/sendfcmpush", function(req, res) {
+    if (loggedIn === null) {
+        logIn(req, res, sendFCMPush);
+    } else {
+        sendFCMPush(req, res);
+    } //qs:{ql:"name='bread' or uuid=b3aad0a4-f322-11e2-a9c1-999e12039f87"}
+});
+
+function sendFCMPush(title, text) {
     console.log("Sending FCM Push....");
     var options = {
         method: 'POST',
