@@ -1406,6 +1406,7 @@ var saveresettokenandsendmail = function(req, res) {
         // encryptedPw = encryptPassword(req.param('password'));
         if (err) {
             console.log("ERROR: " + JSON.stringify(err));
+            res.send("Email Not Found");
         } else {
             console.log("saveresttoken: Found user SUCCESS for email=" + req.param('email'));
             var token = randtoken.generate(16);
