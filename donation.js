@@ -843,9 +843,10 @@ function createevent(e, req, res) {
         } else {
             console.log("#######CreateEvents2 Success!!!!!");
             if (mysocket) {
-                console.log("##### Sending subscribed event object");
+                console.log("##### Sending event " + data.entities[0].group_name);
                 //mysocket.broadcast.emit('matchingevent', o);
-                io.sockets.emit('matchingevent', data);
+                io.sockets.in(data.entities[0].group_name).emit('matchingevent', data);
+                //io.sockets.emit('matchingevent', data);
                 console.log("####Sent matchingevent");
                 var msg = JSON.stringify(data.entities[0].items + "@: " +
                     data.entities[0].address + ". Contact " + data.entities[0].postedby + ": " +
@@ -1531,5 +1532,9 @@ http.listen(PORT, function() {
 });
 io.on('connection', function(socket) {
     mysocket = socket;
+    socket.on('room', function(room) {
+        console.log("####Conecting client socket to room " + room);
+        socket.join(room);
+    });
     console.log('a user connected');
 });
