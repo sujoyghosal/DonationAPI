@@ -1463,6 +1463,10 @@ function sendFCMPush(title, text, topic) {
         console.log("#### No topic received, not sending push");
         return;
     }
+    if (!text || text.length < 2) {
+        console.log("#### No text received, not sending push");
+        return;
+    }
     console.log("Sending FCM Push....");
     var options = {
         method: 'POST',
@@ -1476,7 +1480,7 @@ function sendFCMPush(title, text, topic) {
             recipient: topic,
             isTopic: 'true',
             title: title,
-            body: text,
+            body: text.replace(/\"/g, ""),
             apiKey: 'AAAA5vaWa4o:APA91bGdenh15KUIJVAKISsHLNCgPLka_Npdal5v8YsZnK2lEps5E6Bc0ImAka8zytn1D5t_t0iZSlfqVNSJFTkXYPA3PIhG-3a7qtKDeHfMF3MQNctwW4Dnw2vObuqFeY7zMj62Qud9',
             application: 'com.sujoy.freecycle',
             customData: [{
