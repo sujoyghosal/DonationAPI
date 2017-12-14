@@ -13,8 +13,9 @@ var BASEGUIURL = "http://localhost:3000";
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
 var BASEURL_BLUEMIX = "https://freecycleapissujoy.mybluemix.net";
+var BASEURL_PERSONAL = "https://freecycleapi.au-syd.mybluemix.net";
 var BASEGUIURL = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
-var BASEURL = BASEURL_BLUEMIX;
+var BASEURL = BASEURL_PERSONAL;
 var PORT = process.env.VCAP_APP_PORT || 80;
 
 // Usergrid config - Common for all platforms
