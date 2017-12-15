@@ -3,24 +3,24 @@ var usergrid = require("usergrid");
 var randtoken = require("rand-token");
 var nodemailer = require('nodemailer');
 var request = require("request");
-/*
+
 // Run Locally
 var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
 var BASEGUIURL = "http://localhost:3000";
-*/
+/*
 //Run on Cloud
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
 var BASEURL_BLUEMIX = "https://freecycleapissujoy.mybluemix.net";
-var BASEURL_PERSONAL = "https://freecycleapi.au-syd.mybluemix.net";
 var BASEGUIURL_BLUEMIX = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
-var BASEGUIURL_PERSONAL = "https://freecycleweb.au-syd.mybluemix.net";
+var BASEURL_PERSONAL = "https://freecycleapi.mybluemix.net";
+var BASEGUIURL_PERSONAL = "https://freecycleweb.mybluemix.net";
 
 var BASEURL = BASEURL_BLUEMIX;
 var BASEGUIURL = BASEGUIURL_BLUEMIX;
 var PORT = process.env.VCAP_APP_PORT || 80;
-
+*/
 // Usergrid config - Common for all platforms
 var APPNAME_DEV = 'FREECYCLE';
 var CLIENTID_DEV = 'YXA6G1hmX-hzEea1pBIuBzeXfQ';
@@ -717,6 +717,7 @@ app.get("/createdonations", function(req, res) {
         time: req.param("time"),
         location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
     };
+    console.log("##### createdonations - " + JSON.stringify(e));
     if (loggedIn === null) {
         logIn(req, res, function() {
             createdonations(e, req, res);
