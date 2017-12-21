@@ -1545,5 +1545,9 @@ io.on('connection', function(socket) {
         console.log("####Conecting client socket to room " + room);
         socket.join(room);
     });
+    socket.on('leave', function(room) {
+        console.log("####Disconecting client socket to room " + room);
+        socket.leave(room);
+    });
     console.log('a user connected');
 });
