@@ -3,12 +3,12 @@ var usergrid = require("usergrid");
 var randtoken = require("rand-token");
 var nodemailer = require('nodemailer');
 var request = require("request");
-
+/*
 // Run Locally
 var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
 var BASEGUIURL = "http://localhost:3000";
-/*
+*/
 //Run on Cloud
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
@@ -20,7 +20,7 @@ var BASEGUIURL_PERSONAL = "https://freecycleweb.mybluemix.net";
 var BASEURL = BASEURL_BLUEMIX;
 var BASEGUIURL = BASEGUIURL_BLUEMIX;
 var PORT = process.env.VCAP_APP_PORT || 80;
-*/
+
 // Usergrid config - Common for all platforms
 var APPNAME_DEV = 'FREECYCLE';
 var CLIENTID_DEV = 'YXA6G1hmX-hzEea1pBIuBzeXfQ';
@@ -1546,7 +1546,7 @@ io.on('connection', function(socket) {
         socket.join(room);
     });
     socket.on('leave', function(room) {
-        console.log("####Disconecting client socket to room " + room);
+        console.log("####Disconecting client socket from room " + room);
         socket.leave(room);
     });
     console.log('a user connected');
