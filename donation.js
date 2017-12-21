@@ -867,6 +867,47 @@ function createevent(e, req, res) {
         }
     });
 }
+app.get("/createuserquery", function(req, res) {
+    var name = req.param("email") + "-" + new Date();
+    var e = {
+        name: name,
+        fullname: req.param("fullname"),
+        email: req.param("email"),
+        city: req.param("city"),
+        phone: req.param("phone"),
+        subject: req.param("subject"),
+        text: req.param("text")
+    }
+    console.log("##### createuserquery - " + JSON.stringify(e));
+    if (loggedIn === null) {
+        logIn(req, res, function() {
+            createuserquery(e, req, res);
+        });
+    } else {
+        createuserquery(e, req, res);
+    }
+});
+
+function createuserquery(e, req, res) {
+    var opts = {
+        type: "userqueries"
+            //        name: 'Dominos'
+    };
+    loggedIn.createEntity(opts, function(err, o) {
+        if (err) {
+            res.send(err);
+            return;
+        }
+        o.set(e);
+        o.save(function(err) {
+            if (err) {
+                res.send(err);
+                return;
+            }
+            res.send("QUERY CREATED");
+        });
+    });
+}
 app.get("/connectentities", function(req, res) {
     if (loggedIn === null) {
         logIn(req, res, function() {
