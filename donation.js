@@ -12,6 +12,7 @@ var BASEGUIURL = "http://localhost:3000";
 //Run on Cloud
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
+var BASEGUIURL_PIVOTAL = "http://sujoyfreecycleweb-plutonic-forensics.cfapps.io";
 var BASEURL_BLUEMIX = "https://freecycleapissujoy.mybluemix.net";
 var BASEGUIURL_BLUEMIX = "http://sujoyfreecycleweb-nonfloriferous-capacitation.mybluemix.net";
 var BASEURL_PERSONAL = "https://freecycleapi.mybluemix.net";
