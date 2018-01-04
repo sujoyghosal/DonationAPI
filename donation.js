@@ -69,6 +69,9 @@ app.use(allowCrossDomain);
 //app.use(express.bodyParser());
 app.use(express.urlencoded());
 app.use(express.json());
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // Initialize Usergrid
 var bcrypt = require('bcrypt');
 var encryptedPw = 'null';
@@ -868,28 +871,28 @@ function createevent(e, req, res) {
         }
     });
 }
-app.get("/createuserquery", function(req, res) {
-    var name = req.param("email") + "-" + new Date();
+app.post("/contactus", function(req, res) {
+    var name = req.body.email + "-" + new Date();
     var e = {
         name: name,
-        fullname: req.param("fullname"),
-        email: req.param("email"),
-        city: req.param("city"),
-        phone: req.param("phone"),
-        subject: req.param("subject"),
-        text: req.param("text")
+        fullname: req.body.fullname,
+        email: req.body.email,
+        city: req.body.city,
+        phone: req.body.phone,
+        subject: req.body.subject,
+        text: req.body.text
     }
-    console.log("##### createuserquery - " + JSON.stringify(e));
+    console.log("##### Contact Us request details - " + JSON.stringify(e));
     if (loggedIn === null) {
         logIn(req, res, function() {
-            createuserquery(e, req, res);
+            createcontactusquery(e, req, res);
         });
     } else {
-        createuserquery(e, req, res);
+        createcontactusquery(e, req, res);
     }
 });
 
-function createuserquery(e, req, res) {
+function createcontactusquery(e, req, res) {
     var opts = {
         type: "userqueries"
             //        name: 'Dominos'
@@ -1242,12 +1245,12 @@ function addUserToGroup(e, req, res) {
         }
     });
 }
-app.get("/createuser", function(req, res) {
-    var fullname = req.param("fullname");
-    var password = req.param("password");
-    var email = req.param("email");
-    var phone = req.param("phone");
-    var address = req.param("address");
+app.post("/createuser", function(req, res) {
+    var fullname = req.body.fullname;
+    var password = req.body.password;
+    var email = req.body.email;
+    var organisation = req.body.organisation;
+    var ngo = req.body.ngo;
     encryptedPw = encryptPassword(password);
     var options = {
         method: "POST",
@@ -1256,12 +1259,13 @@ app.get("/createuser", function(req, res) {
             username: email,
             name: email,
             email: email,
-            address: address,
+            organisation: organisation,
             fullname: fullname,
             pw: encryptedPw,
-            phone: phone
+            ngo: ngo
         }
     };
+    console.log("#### Create User Object Is: " + JSON.stringify(options));
     if (loggedIn === null) {
         logIn(req, res, function() {
             createUser(options, req, res);
