@@ -702,10 +702,10 @@ function canceldonation(e, updateoptions, req, res) {
         });
     });
 }
-app.get("/createdonations", function(req, res) {
+app.post("/createdonations", function(req, res) {
     var b = req.body;
-    var name = req.param("email") + "-" + req.param("time");
-    var e = {
+    b.name = req.body.email + "-" + req.param("time");
+    /*var e = {
         name: name,
         offeredby: req.param("offeredby"),
         from_place: req.param("from_place"),
@@ -720,14 +720,14 @@ app.get("/createdonations", function(req, res) {
         status: "OFFERED",
         time: req.param("time"),
         location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
-    };
-    console.log("##### createdonations - " + JSON.stringify(e));
+    };*/
+    console.log("##### createdonations - " + JSON.stringify(b));
     if (loggedIn === null) {
         logIn(req, res, function() {
-            createdonations(e, req, res);
+            createdonations(b, req, res);
         });
     } else {
-        createdonations(e, req, res);
+        createdonations(b, req, res);
     }
 });
 
@@ -751,32 +751,16 @@ function createdonations(e, req, res) {
         });
     });
 }
-app.get("/createneed", function(req, res) {
+app.post("/createneed", function(req, res) {
     var b = req.body;
-    var name = req.param("email") + "-" + req.param("time");
-    var e = {
-        name: name,
-        postedby: req.param("postedby"),
-        city: req.param("city"),
-        address: req.param("address"),
-        phone_number: req.param("phone_number"),
-        email: req.param("email"),
-        currentcount: "0",
-        itemtype: req.param("itemtype"),
-        fa_icon: req.param("fa_icon"),
-        items: req.param("items"),
-        status: "REQUIRED",
-        time: req.param("time"),
-        emergency: req.param('emergency'),
-        location: { latitude: req.param("latitude"), longitude: req.param("longitude") }
-    };
-    console.log("Create Need Body=" + JSON.stringify(e));
+    b.name = req.body.email + "-" + req.param("time");
+    console.log("Create Need Body=" + JSON.stringify(b));
     if (loggedIn === null) {
         logIn(req, res, function() {
-            createneed(e, req, res);
+            createneed(b, req, res);
         });
     } else {
-        createneed(e, req, res);
+        createneed(b, req, res);
     }
 });
 
@@ -808,33 +792,14 @@ function createneed(e, req, res) {
         });
     });
 }
-app.get("/createevent", function(req, res) {
+app.post("/createevent", function(req, res) {
     var t = new Date();
-    var name = req.param("email") + "-" + t;
+    req.body.name = req.body.email + "-" + t;
+    console.log("####Create Event Request Body: " + req.body);
     var options = {
         method: "POST",
         endpoint: "donationevents",
-        body: {
-            name: name,
-            postedby: req.param("postedby"),
-            city: req.param("city"),
-            address: req.param("address"),
-            phone_number: req.param("phone_number"),
-            email: req.param("email"),
-            items: req.param("items"),
-            status: req.param('status'),
-            timestamp: req.param("time"),
-            itemtype: req.param('itemtype'),
-            eventtype: req.param('group_name'),
-            fa_icon: req.param('fa_icon'),
-            group_uuid: req.param('group_uuid'),
-            group_name: req.param('group_name'),
-            location: {
-                latitude: req.param("latitude"),
-                longitude: req.param("longitude")
-            }
-        }
-
+        body: req.body
     };
     if (loggedIn === null) {
         logIn(req, res, function() {
@@ -850,7 +815,7 @@ function createevent(e, req, res) {
         if (err) {
             res.send("ERROR");
         } else {
-            console.log("#######CreateEvents2 Success!!!!!");
+            console.log("#######CreateEvents Success!!!!!");
             if (mysocket) {
                 console.log("##### Sending event " + data.entities[0].group_name);
                 //mysocket.broadcast.emit('matchingevent', o);
@@ -1187,8 +1152,8 @@ function getdonationsbylocation(req, res) {
         res.jsonp(alldonations);
     });
 }
-app.get("/creategroup", function(req, res) {
-    var group = req.param("group");
+app.post("/creategroup", function(req, res) {
+    var group = req.body.group;
     if (group)
         group = group.trim().toUpperCase().replace(/ /g, "-");
     console.log("Creating Group: " + group);
