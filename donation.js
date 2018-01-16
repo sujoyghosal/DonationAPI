@@ -172,7 +172,7 @@ app.get("/getneeds", function(req, res) {
     var emergency = req.param('emergency');
     needs_query = {
         type: "needs?limit=500", //Required - the type of collection to be retrieved
-        qs: { ql: paramname + "='" + paramvalue + "'" + " and emergency='" + emergency + "'" }
+        qs: { ql: paramname + "='" + paramvalue + "'" + " and emergency=" + emergency }
     };
     if (paramname === "uuid") {
         donations_query = {
