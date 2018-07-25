@@ -3,13 +3,12 @@ var usergrid = require("usergrid");
 var randtoken = require("rand-token");
 var nodemailer = require('nodemailer');
 var request = require("request");
-/*
+var sleep = require('sleep');
 // Run Locally
 var PORT = process.env.VCAP_APP_PORT || 9000;
 var BASEURL = "http://localhost:" + PORT;
 var BASEGUIURL = "http://localhost:3000";
-
-*/
+/*
 //Run on Cloud
 var BASEURL_APIGEE = "http://sujoyghosal-test.apigee.net/freecycleapis";
 var BASEURL_PIVOTAL = "http://freecycleapissujoy-horned-erasure.cfapps.io";
@@ -22,7 +21,7 @@ var BASEGUIURL_PERSONAL = "https://freecycleweb.mybluemix.net";
 var BASEURL = BASEURL_PERSONAL;
 var BASEGUIURL = BASEGUIURL_PERSONAL;
 var PORT = process.env.VCAP_APP_PORT || 80;
-
+*/
 // Usergrid config - Common for all platforms
 var APPNAME_DEV = 'FREECYCLE';
 var CLIENTID_DEV = 'YXA6G1hmX-hzEea1pBIuBzeXfQ';
@@ -176,7 +175,7 @@ app.get("/getneeds", function(req, res) {
         qs: { ql: paramname + "='" + paramvalue + "'" + " and emergency=" + emergency }
     };
     if (paramname === "uuid") {
-        donations_query = {
+        needs_query = {
             type: "needs", //Required - the type of collection to be retrieved
             uuid: paramvalue
         };
@@ -189,7 +188,9 @@ app.get("/getneeds", function(req, res) {
 });
 
 function getneeds(req, res) {
+    console.log("#### Needs Query: " + JSON.stringify(needs_query));
     loggedIn.createCollection(needs_query, function(err, needs) {
+        console.log("#### Needs=" + JSON.stringify(needs));
         if (err) {
             res.jsonp(500, { error: JSON.stringify(err) });
             return;
@@ -199,6 +200,7 @@ function getneeds(req, res) {
             var aneed = needs.getNextEntity().get();
             allneeds.push(aneed);
         }
+        console.log("####Response: " + JSON.stringify(allneeds));
         res.jsonp(allneeds);
     });
 }
@@ -837,6 +839,27 @@ function createevent(e, req, res) {
         }
     });
 }
+var stockValue = 100;
+app.get("/getquote", function(req, res) {
+    setInterval(getQuote, 2000)
+    res.jsonp("SUCCESS");
+});
+
+function getQuote() {
+    //for (var i = 0; i < 1000; i++) {
+    if (mysocket) {
+        io.sockets.emit('stockquote', stockValue++);
+        console.log("##### Sent stock value: " + stockValue);
+        //sleep.sleep(5);
+        console.log("####Woke up after 2 seconds sleep");
+    } else {
+        console.log("#### mysocket is null");
+        //res.send("EVENT CREATED BUT NOT BROADCAST DUE TO NULL SOCKET!");
+    }
+    //setTimeout(dummy, 5000);
+
+    //}
+}
 app.post("/contactus", function(req, res) {
     var name = req.body.email + "-" + new Date();
     var e = {
@@ -1101,14 +1124,14 @@ app.get("/vicinityquery", function(req, res) {
             type: "needs?limit=" + count, //Required - the type of collection to be retrieved
             //		qs:criteria
             //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
-            qs: { ql: criteria + " and not (emergency = 'YES' or emergency = true)" }
+            qs: { ql: criteria + " and not (emergency = 'YES' or emergency = 'true')" }
         };
     } else if (type && type === 'emergency') {
         geo_query = {
             type: "needs?limit=" + count, //Required - the type of collection to be retrieved
             //		qs:criteria
             //        qs: {"ql": "location within 500 of 51.5183638, -0.1712939000000233"}
-            qs: { ql: criteria + " and (emergency = true or emergency = 'YES')" }
+            qs: { ql: criteria + " and (emergency = 'true' or emergency = 'YES')" }
         };
         console.log("Emergency Query = " + geo_query);
     } else {
