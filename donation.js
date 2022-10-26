@@ -784,16 +784,21 @@ app.use(
   })
 );
 const httpServer = http.createServer(app);
-const io = require("socket.io")(httpServer, {
+options = {
+  cors: true,
+  origins: ["http://159.122.177.104:31055"],
+};
+/*const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://159.122.177.104:31055",
-    //origin: whitelist,
+    //origin: "http://159.122.177.104:31055",
+    origin: whitelist,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
   allowEIO3: true,
-});
+});*/
+const io = require("socket.io")(httpServer, options);
 var mysocket = null;
 io.on("connection", function (socket) {
   mysocket = socket;
