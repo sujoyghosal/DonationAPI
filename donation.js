@@ -780,7 +780,8 @@ var whitelist = [
 ];
 app.use(
   cors({
-    origin: whitelist,
+    //origin: whitelist,
+    origin: "*",
   })
 );
 const httpServer = http.createServer(app);
