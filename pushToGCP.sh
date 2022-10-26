@@ -1,1 +1,1 @@
-gcloud run deploy donation-demo-api --source .
+gcloud run deploy donation-web --source .
