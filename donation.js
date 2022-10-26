@@ -786,8 +786,8 @@ app.use(
 const httpServer = http.createServer(app);
 const io = require("socket.io")(httpServer, {
   cors: {
-    //origin: "http://localhost:3000",
-    origin: whitelist,
+    origin: "http://159.122.177.104:31055",
+    //origin: whitelist,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
