@@ -1,4 +1,0 @@
-applications:
-- name: FreeCycleAPIsSujoy
-  random-route: true
-  memory: 128M
