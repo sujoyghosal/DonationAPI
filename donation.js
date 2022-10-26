@@ -6,8 +6,6 @@ var http = require("http");
 const cors = require("cors");
 // get MongoDB driver connection
 //const dbo = require("./db/conn");
-var util = require("util");
-var encoder = new util.TextEncoder("utf-8");
 const PORT = process.env.PORT || 5555;
 const app = express();
 
@@ -776,7 +774,7 @@ app.delete("/subscriptions/delete", (req, res) => {
 app.use(cors());
 var whitelist = [
   "https://donation-web-vq2uax3u4q-el.a.run.app",
-  "http://159.122.177.104:31965",
+  "http://159.122.177.104:31055",
   "http://localhost:3000",
   "http://localhost:49160",
 ];
