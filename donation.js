@@ -775,7 +775,7 @@ app.delete("/subscriptions/delete", (req, res) => {
 var whitelist = [
   "https://donation-web-vq2uax3u4q-el.a.run.app",
   "http://localhost:3000",
-  "http://159.122.177.104:31055",
+  "http://159.122.177.104:31363",
 ];
 app.use(
   cors({
