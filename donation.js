@@ -783,23 +783,28 @@ app.use(
     origin: whitelist,
   })
 );
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
 const httpServer = http.createServer(app);
-options = {
-  cors: true,
-  origins: ["http://159.122.177.104:31055"],
-};
+
+/*
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://159.122.177.104",
+    origin: "http://159.122.177.104:31055",
     //origins: whitelist,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
   allowEIO3: true,
-});
+});*/
 
-//const io = require("socket.io")(httpServer, options);
+const io = require("socket.io")(httpServer, {});
 var mysocket = null;
 io.on("connection", function (socket) {
   mysocket = socket;
