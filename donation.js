@@ -788,27 +788,17 @@ options = {
   cors: true,
   origins: ["http://159.122.177.104:31055"],
 };
-/*const io = require("socket.io")(httpServer, {
+const io = require("socket.io")(httpServer, {
   cors: {
-    //origin: "http://159.122.177.104:31055",
-    origin: whitelist,
+    origin: "http://159.122.177.104",
+    //origins: whitelist,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
   allowEIO3: true,
-});*/
-const io = require("socket.io")(httpServer, {
-  handlePreflightRequest: (req, res) => {
-    const headers = {
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Origin": "http://159.122.177.104:31055", //or the specific origin you want to give access to,
-      "Access-Control-Allow-Credentials": true,
-    };
-    res.writeHead(200, headers);
-    res.end();
-  },
 });
+
 //const io = require("socket.io")(httpServer, options);
 var mysocket = null;
 io.on("connection", function (socket) {
