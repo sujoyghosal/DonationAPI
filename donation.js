@@ -771,40 +771,31 @@ app.delete("/subscriptions/delete", (req, res) => {
 //module.exports = recordRoutes;
 // Listen for requests until the server is stopped
 
-app.use(cors());
+//app.use(cors());
 var whitelist = [
   "https://donation-web-vq2uax3u4q-el.a.run.app",
-  "http://159.122.177.104:31055",
   "http://localhost:3000",
-  "http://localhost:49160",
+  "http://159.122.177.104:31055",
 ];
 app.use(
   cors({
     origin: whitelist,
   })
 );
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
 const httpServer = http.createServer(app);
-
-/*
+httpServer.listen(PORT, () => {
+  console.log("listening on *:" + PORT);
+});
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://159.122.177.104:31055",
-    //origins: whitelist,
+    //origin: "http://localhost:3000",
+    origin: whitelist,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
   allowEIO3: true,
-});*/
-
-const io = require("socket.io")(httpServer, {});
+});
 var mysocket = null;
 io.on("connection", function (socket) {
   mysocket = socket;
@@ -825,7 +816,7 @@ io.on("connection", function (socket) {
     socket.leave(room);
   });
 });
-
+/*
 httpServer.listen(PORT, () => {
   console.log("listening on *:" + PORT);
-});
+});*/
