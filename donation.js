@@ -813,7 +813,6 @@ io.on("connection", function (socket) {
   });
   socket.on("leave", function (room) {
     console.log("####Disconecting client socket from room " + room);
-    console.log("Done");
     socket.leave(room);
   });
 });
